@@ -7,6 +7,7 @@ import {
   type SkillAuditInput,
   computeIdentityHash,
 } from "@skillproof/sdk";
+import { SkillAuditor, maskToPermissionNames, loadManifest } from "@skillproof/auditor";
 
 const program = new Command();
 
@@ -47,7 +48,66 @@ program
 
 program
   .command("audit")
-  .description("Generate a ZK proof for a skill audit")
+  .description("Audit a skill manifest and optionally generate a ZK proof")
+  .argument("<manifest-path>", "Path to skill manifest.json")
+  .option("--auditor-secret <value>", "Auditor secret (required for proof generation)")
+  .option("--prove", "Also generate a ZK proof after auditing")
+  .option("--allow-execution", "Allow real module execution in sandbox")
+  .action(async (manifestPath: string, opts: { auditorSecret?: string; prove?: boolean; allowExecution?: boolean }) => {
+    if (opts.prove && !opts.auditorSecret) {
+      console.error("Error: --auditor-secret is required when --prove is set.");
+      process.exit(1);
+    }
+
+    const manifest = loadManifest(manifestPath);
+    const auditor = new SkillAuditor({
+      allowExecution: opts.allowExecution ?? false,
+    });
+
+    console.log(`Auditing skill "${manifest.name}"...\n`);
+
+    if (opts.prove) {
+      const result = await auditor.auditAndProve(manifestPath, {
+        auditorSecret: opts.auditorSecret!,
+      });
+
+      const declaredNames = maskToPermissionNames(result.declaredMask);
+      const observedNames = maskToPermissionNames(result.observedMask);
+
+      console.log(`Skill:                ${manifest.name}`);
+      console.log(`Compliant:            ${result.compliant ? "yes" : "no"}`);
+      console.log(`Declared permissions: ${declaredNames.length > 0 ? declaredNames.join(", ") : "(none)"}`);
+      console.log(`Observed permissions: ${observedNames.length > 0 ? observedNames.join(", ") : "(none)"}`);
+      console.log(`Log entries:          ${result.log.length}`);
+
+      if (result.proof) {
+        console.log("\nProof generated successfully.");
+        console.log("Public signals:");
+        console.log(`  skillHash:          ${result.proof.publicSignals[0]}`);
+        console.log(`  permissionHash:     ${result.proof.publicSignals[1]}`);
+        console.log(`  auditorCommitment:  ${result.proof.publicSignals[2]}`);
+        console.log(`  agentIdHash:        ${result.proof.publicSignals[3]}`);
+        console.log(`  timestamp:          ${result.proof.publicSignals[4]}`);
+      } else if (result.proofError) {
+        console.error(`\nProof generation failed: ${result.proofError}`);
+      }
+    } else {
+      const result = await auditor.audit(manifestPath);
+
+      const declaredNames = maskToPermissionNames(result.declaredMask);
+      const observedNames = maskToPermissionNames(result.observedMask);
+
+      console.log(`Skill:                ${manifest.name}`);
+      console.log(`Compliant:            ${result.compliant ? "yes" : "no"}`);
+      console.log(`Declared permissions: ${declaredNames.length > 0 ? declaredNames.join(", ") : "(none)"}`);
+      console.log(`Observed permissions: ${observedNames.length > 0 ? observedNames.join(", ") : "(none)"}`);
+      console.log(`Log entries:          ${result.log.length}`);
+    }
+  });
+
+program
+  .command("audit-manual")
+  .description("Generate a ZK proof for a skill audit using manual bitmask inputs")
   .requiredOption("--skill-source <value>", "Skill source identifier")
   .requiredOption("--nonce <value>", "Audit nonce")
   .requiredOption("--declared <value>", "Declared permissions (0-255 bitmask)")

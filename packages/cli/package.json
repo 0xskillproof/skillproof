@@ -9,6 +9,7 @@
     "build": "tsc"
   },
   "dependencies": {
+    "@skillproof/auditor": "*",
     "@skillproof/sdk": "*",
     "commander": "^12.0.0"
   },

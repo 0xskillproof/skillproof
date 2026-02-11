@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build SDK
+        run: npm run build --workspace=packages/sdk
+
+      - name: Build Auditor
+        run: npm run build --workspace=packages/auditor
+
+      - name: Build CLI
+        run: npm run build --workspace=packages/cli
+
+      - name: Compile Contracts
+        run: npm run compile --workspace=packages/contracts
+
+      - name: Test Auditor
+        run: npm test --workspace=packages/auditor
+
+      - name: Test Contracts
+        run: npm test --workspace=packages/contracts
