@@ -1,0 +1,13 @@
+{
+  "name": "skillproof",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ZK-Verified Agent Skill Proof Infrastructure for PulseChain",
+  "workspaces": [
+    "packages/contracts",
+    "packages/circuits",
+    "packages/sdk",
+    "packages/cli",
+    "packages/auditor"
+  ]
+}

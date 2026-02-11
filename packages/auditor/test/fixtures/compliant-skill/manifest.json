@@ -1,0 +1,8 @@
+{
+  "name": "file-reader-skill",
+  "version": "1.0.0",
+  "agentId": "42",
+  "entrypoint": "index.js",
+  "permissions": { "FILE_READ": true },
+  "timeout": 5000
+}

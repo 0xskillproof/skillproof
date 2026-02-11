@@ -1,0 +1,18 @@
+{
+  "name": "@skillproof/sdk",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "viem": "^2.38.0",
+    "snarkjs": "^0.7.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}

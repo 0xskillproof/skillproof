@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SkillManifest",
+  "type": "object",
+  "required": ["name", "version", "agentId", "entrypoint", "permissions"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+"
+    },
+    "agentId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "entrypoint": {
+      "type": "string",
+      "minLength": 1
+    },
+    "permissions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "FILE_READ": { "type": "boolean" },
+        "FILE_WRITE": { "type": "boolean" },
+        "NETWORK_READ": { "type": "boolean" },
+        "NETWORK_WRITE": { "type": "boolean" },
+        "SHELL_EXEC": { "type": "boolean" },
+        "ENV_ACCESS": { "type": "boolean" },
+        "CRYPTO_OPS": { "type": "boolean" },
+        "SYSTEM_INFO": { "type": "boolean" }
+      }
+    },
+    "timeout": {
+      "type": "number",
+      "minimum": 100,
+      "maximum": 60000
+    }
+  },
+  "additionalProperties": false
+}

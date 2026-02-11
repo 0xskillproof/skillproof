@@ -1,0 +1,17 @@
+{
+  "name": "@skillproof/auditor",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test test/*.test.js"
+  },
+  "dependencies": {
+    "@skillproof/sdk": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}
